@@ -27,3 +27,12 @@
 *.exe
 *.out
 *.app
+/ipch/TESTBLAS-2fb374a1
+/testBLAS/Debug
+/testBLAS/x64/Debug
+/testBLAS/x64/Release
+/x64/Debug
+/x64/Release
+*.db
+*.opendb
+*.suo
