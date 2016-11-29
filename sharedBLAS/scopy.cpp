@@ -98,14 +98,17 @@ namespace temBLAS
 			}
 #endif
 		}
-#ifdef __AVX512__
+#ifdef __AVX2__
 		else if (nStepY)
 		{
 			__m256i const n8IndexX = _mm256_mullo_epi32(_mm256_set_epi32(7, 6, 5, 4, 3, 2, 1, 0), _mm256_set1_epi32(nStepX));
 			__m256i const n8IndexY = _mm256_mullo_epi32(_mm256_set_epi32(7, 6, 5, 4, 3, 2, 1, 0), _mm256_set1_epi32(nStepY));
+			__m256i const n8IndexX2 = _mm256_slli_epi32(n8IndexX, 1);
+			__m256i const n8IndexY2 = _mm256_slli_epi32(n8IndexY, 1);
 			__m256i const n8IndexX8 = _mm256_slli_epi32(n8IndexX, 3);
 			__m256i const n8IndexY8 = _mm256_slli_epi32(n8IndexY, 3);
 
+#ifdef __AVX512__
 			for (; 0x40 <= uN; uN -= 0x40, prX += 0x40 * nStepX, prY += 0x40 * nStepY)
 			{
 				__m256 const r8A = _mm256_i32gather_ps(prX + _mm_extract_epi32(_mm256_extracti128_si256(n8IndexX, 0), 0), n8IndexX8, sizeof(float));
@@ -126,14 +129,36 @@ namespace temBLAS
 				_mm256_i32scatter_ps(prY + _mm_extract_epi32(_mm256_extracti128_si256(n8IndexY, 1), 2), n8IndexY, r8G, sizeof(float));
 				_mm256_i32scatter_ps(prY + _mm_extract_epi32(_mm256_extracti128_si256(n8IndexY, 1), 3), n8IndexY, r8H, sizeof(float));
 			}
+#endif
 
 			for (; 0x10 <= uN; uN -= 0x10, prX += 0x10 * nStepX, prY += 0x10 * nStepY)
 			{
-				__m256 const r8A = _mm256_i32gather_ps(prX + 0 * nStepX, n8IndexX, sizeof(float));
-				__m256 const r8B = _mm256_i32gather_ps(prX + 8 * nStepX, n8IndexX, sizeof(float));
+				__m256 const r8A = _mm256_i32gather_ps(prX + 0 * nStepX, n8IndexX2, sizeof(float));
+				__m256 const r8B = _mm256_i32gather_ps(prX + 1 * nStepX, n8IndexX2, sizeof(float));
 
-				_mm256_i32scatter_ps(prY + 0 * nStepY, n8IndexY, r8A, sizeof(float));
-				_mm256_i32scatter_ps(PrY + 1 * nStepY, n8IndexY, r8B, sizeof(float));
+#ifdef __AVX512__
+				_mm256_i32scatter_ps(prY + 0 * nStepY, n8IndexY2, r8A, sizeof(float));
+				_mm256_i32scatter_ps(PrY + 1 * nStepY, n8IndexY2, r8B, sizeof(float));
+#else
+				auto *pnY = reinterpret_cast<int*>(prY);
+
+				pnY[nStepY * 0x0] = _mm_extract_ps(_mm256_extractf128_ps(r8A, 0), 0);
+				pnY[nStepY * 0x1] = _mm_extract_ps(_mm256_extractf128_ps(r8B, 0), 0);
+				pnY[nStepY * 0x2] = _mm_extract_ps(_mm256_extractf128_ps(r8A, 0), 1);
+				pnY[nStepY * 0x3] = _mm_extract_ps(_mm256_extractf128_ps(r8B, 0), 1);
+				pnY[nStepY * 0x4] = _mm_extract_ps(_mm256_extractf128_ps(r8A, 0), 2);
+				pnY[nStepY * 0x5] = _mm_extract_ps(_mm256_extractf128_ps(r8B, 0), 2);
+				pnY[nStepY * 0x6] = _mm_extract_ps(_mm256_extractf128_ps(r8A, 0), 3);
+				pnY[nStepY * 0x7] = _mm_extract_ps(_mm256_extractf128_ps(r8B, 0), 3);
+				pnY[nStepY * 0x8] = _mm_extract_ps(_mm256_extractf128_ps(r8A, 1), 0);
+				pnY[nStepY * 0x9] = _mm_extract_ps(_mm256_extractf128_ps(r8B, 1), 0);
+				pnY[nStepY * 0xA] = _mm_extract_ps(_mm256_extractf128_ps(r8A, 1), 1);
+				pnY[nStepY * 0xB] = _mm_extract_ps(_mm256_extractf128_ps(r8B, 1), 1);
+				pnY[nStepY * 0xC] = _mm_extract_ps(_mm256_extractf128_ps(r8A, 1), 2);
+				pnY[nStepY * 0xD] = _mm_extract_ps(_mm256_extractf128_ps(r8B, 1), 2);
+				pnY[nStepY * 0xE] = _mm_extract_ps(_mm256_extractf128_ps(r8A, 1), 3);
+				pnY[nStepY * 0xF] = _mm_extract_ps(_mm256_extractf128_ps(r8B, 1), 3);
+#endif
 			}
 		}
 #endif

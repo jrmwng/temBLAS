@@ -49,7 +49,7 @@ namespace testBLAS
 			{
 				for_each(std::make_integer_sequence<unsigned, 4>(), std::bind([&](auto const uSize, auto const uStepX)
 				{
-					for_each(std::make_integer_sequence<unsigned, 2>(), std::bind([&](auto const uSize, auto const uStepX, auto const uStepY)
+					for_each(std::make_integer_sequence<unsigned, 4>(), std::bind([&](auto const uSize, auto const uStepX, auto const uStepY)
 					{
 						test_scopy<decltype(uSize)::value, decltype(uStepX)::value, decltype(uStepY)::value>();
 					}, uSize, uStepX, std::placeholders::_1));
