@@ -12,3 +12,5 @@
 
 // TODO: reference additional headers your program requires here
 #include <algorithm>
+#include <functional>
+#include "..\sharedBLAS\algorithm.h"

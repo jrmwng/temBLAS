@@ -13,7 +13,7 @@ namespace testBLAS
 	TEST_CLASS(testBLAS)
 	{
 		template <unsigned uSIZE, unsigned uSTEPX, unsigned uSTEPY>
-		void test_scopy()
+		std::enable_if_t<(uSIZE && uSTEPX && uSTEPY)> test_scopy()
 		{
 			float arX[uSIZE * uSTEPX];
 			{
@@ -38,15 +38,23 @@ namespace testBLAS
 				}
 			}
 		}
+		template <unsigned uSIZE, unsigned uSTEPX, unsigned uSTEPY>
+		std::enable_if_t<!(uSIZE && uSTEPX && uSTEPY)> test_scopy()
+		{
+		}
 	public:
 		TEST_METHOD(TestMethod_SCOPY)
 		{
-			test_scopy<123, 1, 1>();
-			test_scopy<123, 2, 1>();
-			test_scopy<123, 3, 1>();
-			test_scopy<128, 1, 1>();
-			test_scopy<128, 2, 1>();
-			test_scopy<128, 3, 1>();
+			for_each(std::make_integer_sequence<unsigned, 128>(), [&](auto const uSize)
+			{
+				for_each(std::make_integer_sequence<unsigned, 4>(), std::bind([&](auto const uSize, auto const uStepX)
+				{
+					for_each(std::make_integer_sequence<unsigned, 2>(), std::bind([&](auto const uSize, auto const uStepX, auto const uStepY)
+					{
+						test_scopy<decltype(uSize)::value, decltype(uStepX)::value, decltype(uStepY)::value>();
+					}, uSize, uStepX, std::placeholders::_1));
+				}, uSize, std::placeholders::_1));
+			});
 		}
 	};
 }
