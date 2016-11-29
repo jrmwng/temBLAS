@@ -45,7 +45,7 @@ namespace testBLAS
 	public:
 		TEST_METHOD(TestMethod_SCOPY)
 		{
-			for_each(std::make_integer_sequence<unsigned, 128>(), [&](auto const uSize)
+			for_each(std::make_integer_sequence<unsigned, 32>(), [&](auto const uSize)
 			{
 				for_each(std::make_integer_sequence<unsigned, 4>(), std::bind([&](auto const uSize, auto const uStepX)
 				{

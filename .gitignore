@@ -36,3 +36,4 @@
 *.db
 *.opendb
 *.suo
+/testBLAS/Release

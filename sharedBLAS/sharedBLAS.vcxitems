@@ -14,9 +14,12 @@
     <ProjectCapability Include="SourceItemsFromImports" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="$(MSBuildThisFileDirectory)algorithm.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)scopy.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)sscal.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="$(MSBuildThisFileDirectory)scopy.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)sscal.cpp" />
   </ItemGroup>
 </Project>
